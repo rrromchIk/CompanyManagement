@@ -2,14 +2,18 @@ package com.rom4ik.companymanagementservice.controller;
 
 import com.rom4ik.companymanagementservice.dto.ManagerDTO;
 import com.rom4ik.companymanagementservice.dto.ProgrammerDTO;
+import com.rom4ik.companymanagementservice.exception.EmployeeValidationException;
 import com.rom4ik.companymanagementservice.model.Manager;
 import com.rom4ik.companymanagementservice.model.Programmer;
+import com.rom4ik.companymanagementservice.response.EmployeeErrorResponse;
 import com.rom4ik.companymanagementservice.service.EmployeesService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,7 +61,7 @@ public class EmployeesController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createProgrammer(@RequestBody @Valid ProgrammerDTO programmerDTO, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
-
+            throw new EmployeeValidationException(getErrorMessages(bindingResult));
         }
 
         employeeService.createProgrammer(convertProgrammerDTOtoEntity(programmerDTO));
@@ -67,7 +71,7 @@ public class EmployeesController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createManager(@RequestBody @Valid ManagerDTO managerDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-
+            throw new EmployeeValidationException(getErrorMessages(bindingResult));
         }
 
         employeeService.createManager(convertManagerDTOtoEntity(managerDTO));
@@ -79,11 +83,27 @@ public class EmployeesController {
         //TODO
     }
 
+    @ExceptionHandler
+    private ResponseEntity<EmployeeErrorResponse> handleEmployeeValidationException(EmployeeValidationException exc) {
+        EmployeeErrorResponse employeeErrorResponse = new EmployeeErrorResponse(exc.getMessage());
+        return new ResponseEntity<>(employeeErrorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
     private Programmer convertProgrammerDTOtoEntity(ProgrammerDTO programmerDTO) {
         return modelMapper.map(programmerDTO, Programmer.class);
     }
 
     private Manager convertManagerDTOtoEntity(ManagerDTO managerDTO) {
         return modelMapper.map(managerDTO, Manager.class);
+    }
+
+    private String getErrorMessages(BindingResult bindingResult) {
+        StringBuilder errMsg = new StringBuilder();
+        List<FieldError> errors = bindingResult.getFieldErrors();
+        for(FieldError fieldError : errors) {
+            errMsg.append(fieldError.getField())
+                    .append(" - ").append(fieldError.getDefaultMessage()).append(";");
+        }
+        return errMsg.toString();
     }
 }

@@ -43,7 +43,7 @@ public class ProjectsController {
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody @Valid ProjectDTO projectDTO, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
-
+            //TODO
         }
 
         projectsService.create(convertDtoToEntity(projectDTO));
@@ -53,7 +53,7 @@ public class ProjectsController {
     @ResponseStatus(HttpStatus.OK)
     public void update(@RequestBody @Valid ProjectDTO projectDTO, BindingResult bindingResult, @PathVariable int id) {
         if(bindingResult.hasErrors()) {
-
+            //TODO
         }
 
         projectsService.update(convertDtoToEntity(projectDTO), id);
