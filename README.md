@@ -8,3 +8,8 @@ The teams consist of managers and programmers of different levels (Jun/Mid/Senio
 All of them can work on multiple projects at the same time.
 A relational database must be used for data storage.
 ```
+
+### For implementation tools used:
+```
+Srpring Frameworks(Boot, MVC, DataJpa), Hibernate, ProjectLombok
+```
